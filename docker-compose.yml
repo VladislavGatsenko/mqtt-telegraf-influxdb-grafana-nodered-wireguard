@@ -34,7 +34,7 @@ services:
       - ~/wireguard/config:/config
       - /lib/modules:/lib/modules
     ports:
-      - 51820:51820/udp
+      - 1871:1871/udp
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: always
