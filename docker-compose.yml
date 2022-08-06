@@ -1,0 +1,102 @@
+version: "2"
+services:
+  influxdb:
+    container_name: influxdb
+    image: influxdb
+    environment:
+      - TZ=Europe/Moscow
+    ports:
+      - "8086:8086"
+    volumes:
+      - ~/influxdb/data:/var/lib/influxdb
+    networks:
+      - influxdb-net
+    restart: always
+
+  wireguard:
+    container_name: wireguard
+    image: lscr.io/linuxserver/wireguard:latest
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Moscow
+      - SERVERURL=ru-dev-serv.asuscomm.com #optional
+      - SERVERPORT=1871 #optional
+      - PEERS=5 #optional
+      - PEERDNS=1.1.1.1 #optional
+      - INTERNAL_SUBNET=10.13.13.0 #optional
+      - ALLOWEDIPS=0.0.0.0/0 #optional
+      - LOG_CONFS=false #optional
+    volumes:
+      - ~/wireguard/config:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - 51820:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: always
+
+  telegraf:
+    container_name: telegraf
+    image: telegraf
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - ~/telegraf/conf/telegraf.conf:/etc/telegraf/telegraf.conf
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - telegraf-net
+    restart: always
+    
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    environment:
+      - TZ=Europe/Moscow
+    ports:
+      - "80:80"
+    volumes:
+      - ~/grafana/data:/var/lib/grafana
+      - ~/grafana/log:/var/log/grafana
+      - ~/grafana/conf/grafana.ini:/etc/grafana/grafana.ini
+    links:
+      - influxdb
+    networks:
+      - grafana-net
+    restart: always
+
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto:latest
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - ~/mosquitto/:/mosquitto  
+    ports:
+      - 1883:1883
+    networks:
+      - mosquitto-net
+    restart: always
+
+  node-red:
+    container_name: node-red
+    image: nodered/node-red:latest
+    environment:
+      - TZ=Europe/Moscow
+    ports:
+      - "1880:1880"
+    volumes:
+      - ~/node-red/data:/data
+    networks:
+      - node-red-net
+    restart: always
+
+networks:
+  node-red-net:
+  influxdb-net:
+  mosquitto-net:
+  grafana-net:
+  telegraf-net:
