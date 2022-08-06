@@ -2,6 +2,7 @@
 Docker compose repo with MQTT, Telegraf, InfluxDB, Grafana, Node-RED, WireGuard
 
 1 step:
+
 mkdir -m 777 -p ~/mosquitto/config && \
 mkdir -m 777 -p ~/mosquitto/data && \
 mkdir -m 777 -p ~/mosquitto/log && \
@@ -15,6 +16,7 @@ mkdir -m 777 -p ~/node-red/data && \
 mkdir -m 777 -p ~/wireguard/config
 
 2 step:
+
 cat > ~/mosquitto/config/mosquitto.conf <<EOF
 listener 1883
 #allow_anonymous false
@@ -22,12 +24,14 @@ listener 1883
 EOF
 
 3 step:
+
 cat > ~/grafana/conf/grafana.ini <<EOF
 [server]
 http_port = 80
 EOF
 
 4 step:
+
 cat >  ~/telegraf/conf/telegraf.conf <<EOF
 [agent]
   interval = "3s"
@@ -57,6 +61,7 @@ cat >  ~/telegraf/conf/telegraf.conf <<EOF
 EOF
 
 5 step 
+
 cat > docker-compose.yml <<EOF
 version: "2"
 services:
@@ -163,12 +168,15 @@ networks:
 EOF
 
 6 step
+
 docker compose up -d
 
 7 step
+
 docker exec -it mosquitto mosquitto_passwd -c /mosquitto/config/password.txt IoT
 
 8 step
+
 cat > ~/mosquitto/config/mosquitto.conf <<EOF
 listener 1883
 allow_anonymous false
@@ -176,25 +184,33 @@ password_file /mosquitto/config/password.txt
 EOF
 
 9 step
+
 docker restart mosquitto
 
 10 step
+
 docker exec -it node-red node-red-admin hash-pw
 
 11 step (add hast to node config)
+
 nano +76,5 ~/node-red/data/settings.js
 
 12 step
+
 docker restart node-red
 
 13 step
+
 copy influx token 
 
 14 step: edit influx token in telegraf.conf
+
 nano +15,12 ~/telegraf/conf/telegraf.conf
 
 15 step
+
 docker restart telegraf
 
 16 step (wireguard peer conf recive)
+
 docker exec -it wireguard /app/show-peer 1
