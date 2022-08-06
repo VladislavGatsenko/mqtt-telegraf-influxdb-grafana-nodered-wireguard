@@ -23,7 +23,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Moscow
-      - SERVERURL=ru-dev-serv.asuscomm.com #optional
+      - SERVERURL=auto #optional
       - SERVERPORT=1871 #optional
       - PEERS=5 #optional
       - PEERDNS=1.1.1.1 #optional
